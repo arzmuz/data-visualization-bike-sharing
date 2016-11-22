@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+<!--         <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script> -->
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?libraries=visualization"></script>
+<!--    <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js?1.29.1"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+    <script type="text/javascript" src="js/tooltip.js"></script>
+<!--    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=visualization"></script> -->
+
+    <style type="text/css">
+
+
+      #left-user-pane
+      {
+/*        margin-top: -21em;*/
+        font: 13px sans-serif;
+        color: white;
+        width: 23.3%;
+        float: left;
+        left: 10%;
+        padding-left: 2%;
+        padding-top: 0%;
+        margin-top: -0.5%;
+      }
+
+      div form input
+      {
+        margin-right: 8px;
+        margin-left: 8px;
+      }
+
+/*      .userForm input:checked + label
+      {
+        font-weight: bold;
+        font-size: 15px;
+      }*/
+
+      .textBox
+      {
+        width: 5%;
+        background-color: lightgrey;
+      }
+
+      .userOptions, .userFilters
+      {
+        border: solid rgba(100,10,0,0.6);
+        box-shadow: 0px 0px 1px 2px white;
+        border-style: double;
+        border-width: 2px;
+        border-radius: 15px;
+        width: 90%;     
+        text-align: -webkit-center; 
+        padding-bottom: 2%;  
+      }
+
+      html, body
+      {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #1f77b4;
+        /*left: 33.4%;
+        top: -5%;*/
+      }
+
+      h1
+      {
+        color: #00faa1;
+        width: 90%;
+        text-align: center;
+        border: solid rgba(100,10,0,0.6);
+        box-shadow: 0px 0px 1px 2px white;
+        border-style: double;
+        border-width: 2px;
+        border-radius: 15px;
+        margin-bottom: 5%;
+        margin-top: 4%;
+      }
+
+      h2
+      {
+       color: #00faa1;
+       width: 100%;
+       text-align: center; 
+       margin-top: 2%;    
+      }
+
+      .userOptions h2
+      {
+        margin-bottom: -2%;   
+      }
+
+      h3
+      {
+        margin-bottom: -5%;
+        margin-top: -1%;
+        color: #ffcc00;
+      }
+
+      #map 
+      {
+        width: 75%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        left: 25.4%;
+        top: 0%;
+        overflow: inherit !important;
+      }
+
+/*      #map 
+      {
+      	margin-left: 21.7em;
+      }*/
+
+      .stations, .stations svg 
+      {
+        position: absolute;
+      }
+
+/*      .stations svg 
+      {
+        width: 60px;
+        height: 20px;
+        padding-right: 100px;
+        font: 10px sans-serif;
+      }*/
+
+/*      .stations circle 
+      {
+        fill: rgba(0,0,0,0.4);        
+        stroke: black;
+        stroke-width: 1px;
+      }*/
+
+      .tooltip 
+      {
+        color: white;
+        box-shadow: 0px 0px 4px 2px #666;        
+        border-style: double;
+        border-width: 3px;
+        border-radius: 25px;
+        font: 10px sans-serif;        
+        background-color: rgba(0,0,0,0.7);
+        padding: 10px;
+        /*width:100px;*/
+        /*height: 1px;*/
+      }
+
+      #filterInfo, #legendInfo  
+      {
+        background-color: #333;
+        color: white;
+        border-radius: 8px;
+        float: right;
+        width: 10%;     
+        font-family: cursive;
+        margin: -5%; 
+        font-size: 1.5em;  
+      }
+
+      .filterInfoTooltip, .legendInfoTooltip, #nowShowingTooltip
+      {
+        display: block;
+        position: relative;
+      }
+
+    .filterInfoTooltip:hover:after, .legendInfoTooltip:hover:after{
+        font-size: 1.2em;
+        background: #333;
+        background: rgba(0,0,0,0.7);
+        border-radius: 5px;
+        /*bottom: 13px;*/
+        color: #fff;
+        content: attr(title);
+        /*left: 80%;*/
+        padding: 5px 15px;
+        position: fixed;
+        z-index: 98;
+        width: 15%;
+        top: 10%;
+        left: 25.5%;
+    }
+
+    #legendInfo 
+    {
+      margin:0; 
+      margin-top: -40px; 
+      float:left;
+      width: 15%;
+    }
+
+    .legendInfoTooltip:hover:after
+    {
+        left: 0%;
+        top: 10%;
+        width: auto;  
+        font-size: 1.3em;      
+    }
+
+    #refreshMap
+    {
+      background-color: lightgrey;
+      border-radius: 10px;
+      padding: 2%;
+      float: right;
+      margin-top: -34px;
+      margin-right: -5%;
+    }
+
+    #legend {
+      background-color: #1f77b4;
+      color: white;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    #legend h2
+    {
+      font-size: 1.7em;
+    }
+
+    img
+    {
+      width: 15%;
+      padding-right: 4%;
+      margin-bottom: -3%;
+    }
+
+    #nowShowingDiv
+    {
+      position: fixed;
+      right: 46% !important;
+      font-size: 1.5em;
+      background: #333;
+      background: rgba(0,0,0,0.7);
+      border-radius: 5px;
+      color: #fff;
+      padding: 5px 15px;
+      z-index: 90;
+      text-align: center;
+      top: 0% !important;
+    }
+
+    #nowShowingDiv h2
+    {
+      text-align: center; 
+      font-size: 1.3em;
+      margin-bottom: 2%;
+    }
+
+    </style>
+
+  </head>
+  
+  <body>
+
+    <div id="left-user-pane">
+      <form class="userForm" name="userForm">
+
+        <h1>Hubway Historical Data Visualizer</h1>
+
+        <div class="userOptions">
+
+        <h2>Options</h2>          
+
+        <button id="refreshMap" type="button">Refresh <br> Map</button>
+        <br>
+        
+        <input id="tripConnections" type="checkbox" name="options" value="tripConnections" checked="true">
+        <label for="tripConnections">Trip Connections</label> <br>
+
+        <input id="heatMap" type="checkbox" name="options" value="heatMap">
+        <label for="heatMap">Heat Map</label>
+       
+        <input id="bikeRoutes" type="checkbox" name="options" value="bikeRoutes">
+        <label for="bikeRoutes">Bike Routes</label> <br>
+
+        </div>
+
+        <br>
+
+        <div class="userFilters">
+
+        <a title="Note: For registered users, age is not always recoded but gender is. 
+        For casual users, age and gender are never recorded." class="filterInfoTooltip">
+          <span title="">
+            <button id="filterInfo" type="button">i</button>        
+          </span>
+        </a>
+
+        <h2>Filters</h2>
+
+        <h3>Trips </h3> <br>
+        <input id="outgoingTrips" type="radio" name="trips" value="outgoingTrips" checked="true"> Outgoing
+        <input id="incomingTrips" type="radio" name="trips" value="incomingTrips"> Incoming
+
+        <br><br>
+
+        <h3>Subscription Type </h3> <br>
+        <input id="subscriptionRegistered" type="checkbox" name="options" value="subscriptionRegistered" checked="true">
+        <label for="subscriptionRegistered">Registered</label>
+
+        <input id="subscriptionCasual" type="checkbox" name="options" value="subscriptionCasual" checked="true">
+        <label for="subscriptionCasual">Casual</label> <br>
+
+        <br>
+        
+        <h3>Gender </h3> <br>
+        <input id="genderMale" type="checkbox" name="options" value="genderMale" checked="true">
+        <label for="genderMale">Male</label>
+
+        <input id="genderFemale" type="checkbox" name="options" value="genderFemale" checked="true">
+        <label for="genderFemale">Female</label> <br>
+
+        <input id="genderUnknown" type="checkbox" name="options" value="genderUnknown" checked="true">
+        <label for="genderUnknown">Unknown Gender</label> <br>
+
+        <br>
+
+        <h3>Age </h3> <br>
+        Begin (icl.): <input class="textBox" id="ageRangeBegin" type="text" name="ageRangeBegin" value="">years<br>
+        End (excl.): <input class="textBox" id="ageRangeEnd" type="text" name="ageRangeEnd" value="">years<br>
+        <!-- <input type="submit" value="Submit"> -->
+
+        <br>
+
+        <h3>Journey Start Times </h3><br>
+        Begin (icl.): <input class="textBox" id="hourRangeBegin" type="text" name="hourRangeBegin" value="00">hours<br>
+        End (excl.): <input class="textBox" id="hourRangeEnd" type="text" name="hourRangeEnd" value="24">hours<br>
+        <!-- <input type="submit" value="Submit"> -->
+
+        <br>
+
+        <h3>Journey Duration </h3><br>
+        Begin (icl.): <input class="textBox" id="durationRangeBegin" type="text" name="durationRangeBegin" style="width: 13%;">mins<br>
+        End (excl.): <input class="textBox" id="durationRangeEnd" type="text" name="durationRangeEnd" style="width: 13%;">mins<br>
+
+        <br>
+        
+        <h3>Days </h3><br>
+        <input id="dayMonday" type="checkbox" name="options" value="dayMonday" checked="true">
+        <label for="dayMonday">Mon</label>
+        
+        <input id="dayTuesday" type="checkbox" name="options" value="dayTuesday" checked="true">
+        <label for="dayTuesday">Tue</label>
+        
+        <input id="dayWednesday" type="checkbox" name="options" value="dayWednesday" checked="true">
+        <label for="dayWednesday">Wed</label>
+        
+        <input id="dayThursday" type="checkbox" name="options" value="dayThursday" checked="true">
+        <label for="dayThursday">Thur</label> <br>
+        
+        <input id="dayFriday" type="checkbox" name="options" value="dayFriday" checked="true">
+        <label for="dayFriday">Fri</label>
+        
+        <input id="daySaturday" type="checkbox" name="options" value="daySaturday" checked="true">
+        <label for="daySaturday">Sat</label>
+
+        <input id="daySunday" type="checkbox" name="options" value="daySunday" checked="true">
+        <label for="daySunday">Sun</label>
+
+      </div>
+
+      </form>
+    
+    </div>
+
+      <div id="legend" style="display:none">
+        <h2>Legend</h2>
+
+        <a title="" class="legendInfoTooltip" id="legendInfoTooltip">
+          <span title="">
+            <button id="legendInfo" type="button">i</button>        
+          </span>
+        </a>
+
+      </div>
+
+      <div id="nowShowingDiv" style="display:none">
+      </div>
+
+    <div id="map"></div>
+
+    <script type="text/javascript">
+
+    var hourNumberFormat = d3.time.format("%H"); // 24 hour clock
+    var yearFormat = d3.time.format("%y"); // without century
+    var monthNameFormat = d3.time.format("%b"); // abbreviated month name
+    var dayNameFormat = d3.time.format("%a"); // abbreviated day name
+    var timeFormat = d3.time.format("%m/%d/%Y %H:%M");
+
+    var circleMarkersArray = [];  
+    var mapZoomLevel = 12;
+    var showTripConnections = true;
+    var userSpecifiedDurationRange = false;
+    var filterSubscription = ["R","C"];
+    var filterGender = ["M","F",""];
+    var filterDays = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
+    var hourRangeBegin;
+    var hourRangeEnd;
+    var showIncomingTrips = false;
+    var nowShowingDiv = document.createElement('div');
+        
+    var refreshMap = function()
+    {
+        map.setCenter(new google.maps.LatLng(42.356617, -71.094747));
+        map.setZoom(mapZoomLevel);   
+    }
+
+    var rmLines = function(linesArray)
+    {
+      if (linesArray != null)
+      {
+          for (var i = 0; i < linesArray.length; i++) {
+            linesArray[i].setMap(null);
+          }
+      }
+    }
+
+    // Enable bike routes
+    var bikeLayer = new google.maps.BicyclingLayer();
+
+    var refreshMapButton = document.querySelector('#refreshMap');
+    refreshMapButton.addEventListener('click', function(ev) {
+      refreshMap();
+    }, false);
+
+    var bikeRoutesBox = document.querySelector('#bikeRoutes');
+    bikeRoutesBox.addEventListener('click', function(ev) {
+      if (bikeRoutesBox.checked)
+      {
+        bikeLayer.setMap(map);
+      }
+      else
+      {
+        bikeLayer.setMap(null);
+      }
+    }, false);
+
+    var tripConnectionsBox = document.querySelector('#tripConnections');
+    tripConnectionsBox.addEventListener('click', function(ev) {
+      if (tripConnectionsBox.checked)
+      {
+        showTripConnections = true;
+      }
+      else
+      {
+        showTripConnections = false;
+      }
+    }, false);
+
+    var heatmap = new google.maps.visualization.HeatmapLayer({
+      data: circleMarkersArray,
+      // gradient: rgba(0, 255, 255, 1)
+      radius: 30,
+      opacity: 0.9,
+      dissipating: true
+    });
+
+    var heatMapBox = document.querySelector('#heatMap');
+    heatMapBox.addEventListener('click', function(ev) {
+      if (heatMapBox.checked)
+      {
+        heatmap.setMap(map);
+      }
+      else
+      {
+        heatmap.setMap(null);
+      }
+    }, false);
+
+    var genderMaleBox = document.querySelector('#genderMale');
+    genderMaleBox.addEventListener('click', function(ev) {
+      
+      if (genderMaleBox.checked)
+      {
+          filterGender.push("M");
+      }
+      else
+      {
+        if (filterGender.valueOf("M") != -1)
+        {
+          filterGender.splice([ filterGender.indexOf("M") ],1);
+        }
+      }
+    }, false);
+
+    var genderFemaleBox = document.querySelector('#genderFemale');
+    genderFemaleBox.addEventListener('click', function(ev) {
+      if (genderFemaleBox.checked)
+      {
+          filterGender.push("F");
+      }
+      else
+      {
+          filterGender.splice([ filterGender.indexOf("F") ],1);
+      }
+    }, false);
+
+    var genderUnknownBox = document.querySelector('#genderUnknown');
+    genderUnknownBox.addEventListener('click', function(ev) {
+      if (genderUnknownBox.checked)
+      {
+          filterGender.push("");
+      }
+      else
+      {
+          filterGender.splice([ filterGender.indexOf("") ],1);      
+      }
+    }, false);
+
+    var subscriptionRegisteredBox = document.querySelector('#subscriptionRegistered');
+    subscriptionRegisteredBox.addEventListener('click', function(ev) {
+      if (subscriptionRegisteredBox.checked)
+      {
+          filterSubscription.push("R");
+      }
+      else
+      {
+          filterSubscription.splice([ filterSubscription.indexOf("R") ],1);        
+      }
+    }, false);
+
+    var subscriptionCasualBox = document.querySelector('#subscriptionCasual');
+    subscriptionCasualBox.addEventListener('click', function(ev) {
+      if (subscriptionCasualBox.checked)
+      {
+          filterSubscription.push("C");
+      }
+      else
+      {
+          filterSubscription.splice([ filterSubscription.indexOf("C") ],1);        
+      }
+    }, false);
+
+    var dayMondayBox = document.querySelector('#dayMonday');
+    dayMondayBox.addEventListener('click', function(ev) {
+      if (dayMondayBox.checked)
+      {
+          filterDays.push("Mon");
+      }
+      else
+      {
+          filterDays.splice([ filterDays.indexOf("Mon") ],1);    
+      }
+    }, false);
+
+    var dayTuesdayBox = document.querySelector('#dayTuesday');
+    dayTuesdayBox.addEventListener('click', function(ev) {
+      if (dayTuesdayBox.checked)
+      {
+          filterDays.push("Tue");
+      }
+      else
+      {
+          filterDays.splice([ filterDays.indexOf("Tue") ],1);    
+      }
+    }, false);
+
+    var dayWednesdayBox = document.querySelector('#dayWednesday');
+    dayWednesdayBox.addEventListener('click', function(ev) {
+      if (dayWednesdayBox.checked)
+      {
+          filterDays.push("Wed");
+      }
+      else
+      {
+          filterDays.splice([ filterDays.indexOf("Wed") ],1);    
+      }
+    }, false);        
+
+    var dayThursdayBox = document.querySelector('#dayThursday');
+    dayThursdayBox.addEventListener('click', function(ev) {
+      if (dayThursdayBox.checked)
+      {
+          filterDays.push("Thu");
+      }
+      else
+      {
+          filterDays.splice([ filterDays.indexOf("Thu") ],1);    
+      }
+    }, false);
+
+    var dayFridayBox = document.querySelector('#dayFriday');
+    dayFridayBox.addEventListener('click', function(ev) {
+      if (dayFridayBox.checked)
+      {
+          filterDays.push("Fri");
+      }
+      else
+      {
+          filterDays.splice([ filterDays.indexOf("Fri") ],1);    
+      }
+    }, false);
+
+    var daySaturdayBox = document.querySelector('#daySaturday');
+    daySaturdayBox.addEventListener('click', function(ev) {
+      if (daySaturdayBox.checked)
+      {
+          filterDays.push("Sat");
+      }
+      else
+      {
+          filterDays.splice([ filterDays.indexOf("Sat") ],1);    
+      }
+    }, false);    
+
+    var daySundayBox = document.querySelector('#daySunday');
+    daySundayBox.addEventListener('click', function(ev) {
+      if (daySundayBox.checked)
+      {
+          filterDays.push("Sun");
+      }
+      else
+      {
+          filterDays.splice([ filterDays.indexOf("Sun") ],1);    
+      }
+    }, false);    
+
+    // if (document.getElementById("BR").checked == true)
+    // {
+    //   console.log("YES");
+    // }
+    // else
+    // {
+    //        console.log("NO"); 
+    // }
+
+    // if(d3.select("#BR").checked)
+    // {
+    //  console.log("YES");
+    // }
+    // else
+    // {
+    //        console.log("NO"); 
+    // }
+
+// function options(checkbox)
+// {
+//     if (checkbox.checked)
+//     {
+//         alert("yes");
+//     }
+//     else
+//     {
+//       alert("no");
+//     }
+// }
+
+      // Set Google Map options
+      var mapOptions = 
+      {
+        zoom: mapZoomLevel,
+        center: new google.maps.LatLng(42.356617, -71.094747),
+        //mapTypeId: google.maps.MapTypeId.ROADMAP
+        //mapTypeId: google.maps.MapTypeId.HYBRID
+        mapTypeId: google.maps.MapTypeId.TERRAIN
+      };
+
+      // Create Google Map
+      var map = new google.maps.Map(d3.select("#map").node(), mapOptions);
+
+      map.controls[google.maps.ControlPosition.RIGHT_TOP].push(
+      document.getElementById('legend')); 
+
+      map.controls[google.maps.ControlPosition.RIGHT_TOP].push(
+      document.getElementById('nowShowingDiv')); 
+
+      // map.event.addListener(map, 'bounds_changed', function() {
+      //   map.css({ height: '500px', width: '500px' }); // back to desired dims
+      //   map.event.trigger(map, 'resize'); // trigger a 'refresh'
+      //   map.setCenter(new google.maps.LatLng(-18.2, 35.1)); // re-center map
+      //   map.event.clearListeners(map, 'bounds_changed'); // don't do this again
+      // });
+
+       function type_tripData(d) {
+        d.strt_statn = +d.strt_statn;
+        d.duration = +d.duration;
+        d.end_statn = +d.end_statn;
+        d.birth_date = +d.birth_date;
+        return d;
+       }
+
+     d3.csv("/data-sets/hubway_trips_2012.csv", type_tripData, function(tripData) {
+
+       //Change the type from string to int                  
+       function type_pairData(thisPair) {
+          // thisPair.source = +thisPair.source;
+          // thisPair.destination  = +thisPair.destination;
+          thisPair.frequency = +thisPair.frequency;
+        return thisPair;
+       }
+
+        var ageRangeFromData = d3.extent(tripData, function (ageExtentData){
+          
+          var dateOfBirth = +ageExtentData.birth_date;
+
+          if (dateOfBirth != 0)
+          {
+            return dateOfBirth;
+          }
+        });
+
+        ageRangeFromData[0] = 2012 - ageRangeFromData[0];
+        ageRangeFromData[1] = 2012 - ageRangeFromData[1];
+
+        var filterAgeRangeBegin = document.getElementById("ageRangeBegin").value = ageRangeFromData[1];
+        var filterAgeRangeEnd = document.getElementById("ageRangeEnd").value = ageRangeFromData[0];
+
+        var ageRangeBeginBox = document.querySelector('#ageRangeBegin');
+        ageRangeBeginBox.addEventListener('change', function(ev) {
+          filterAgeRangeBegin = document.getElementById("ageRangeBegin").value;
+        }, false);
+
+        var ageRangeEndBox = document.querySelector('#ageRangeEnd');
+        ageRangeEndBox.addEventListener('change', function(ev) {
+          filterAgeRangeEnd = document.getElementById("ageRangeEnd").value;
+        }, false);
+
+        var filterDuration = d3.extent(tripData, function (durationExtentData){return +durationExtentData.duration});
+        filterDuration[0] = 0;
+
+        var durationRangeBegin = document.getElementById("durationRangeBegin").value = Math.round(filterDuration[0]/60);
+        var durationRangeEnd = document.getElementById("durationRangeEnd").value = Math.round(filterDuration[1]/60);
+
+      // if (!userSpecifiedDurationRange)
+      //   {
+
+
+          //var durationRangeBegin = d3.select("#durationRangeBegin");
+
+          // var durationRangeBegin = document.querySelector('#durationRangeBegin');
+          // durationRangeBegin.addEventListener('onload', function(ev) {
+          //   durationRangeBegin.value = "HELLO";
+          // }, false);                    
+
+          //console.log(durationRangeBegin);
+        // }
+
+       var frequencyOpacityScale = 0;
+       var frequencyMean = 0;
+       var frequencyMedian = 0;
+
+       d3.csv("/data-sets/hubway_trips_2012_pairs.csv", type_pairData, function(pairData) { 
+
+        var frequencyExtent = d3.extent(pairData, function (d){return d.frequency});
+        frequencyMean = d3.mean(pairData, function (d){return d.frequency});
+        frequencyMedian = d3.median(pairData, function (d){return d.frequency});
+
+        // console.log(frequencyExtent);
+        // console.log("mean: " + frequencyMean);
+        // console.log("median: " + frequencyMedian);
+
+        // var frequencyColourScale = d3.scale.ordinal()
+        //                             .domain(frequencyExtent)
+        //                      // .range(["#d62728", "#bcbd22"]);
+        //                     //.range(["yellow", "red"]);       
+        //                             .range(["#393b79", "#5254a3", "#6b6ecf", "#9c9ede"]); 
+
+        frequencyOpacityScale = d3.scale.linear()
+                            .domain(frequencyExtent)
+                            .range([0,1]);
+
+      // var setPairsToFrequency = d3.set([]);
+      // var mapPairsToTotalFrequency = d3.map([]);
+
+      // tripData.forEach(function(thisTrip) {
+      //   setPairsToFrequency.add(stationOfInterest);
+      // });
+      
+      // tripData.forEach(function(thisTrip) {
+
+      //   setPairsToFrequency.forEach(function(uniqueStation){
+          
+      //     if (stationOfInterest == uniqueStation)
+      //     {                   
+      //       if (mapPairsToTotalFrequency.has(uniqueStation + "," + thisTrip.end_statn))
+      //       {
+      //         var previousFrequency = mapPairsToTotalFrequency.get(uniqueStation + "," + thisTrip.end_statn);
+      //         mapPairsToTotalFrequency.set(uniqueStation + "," + thisTrip.end_statn, previousFrequency+1);
+      //       }
+      //       else
+      //       {
+      //         mapPairsToTotalFrequency.set(uniqueStation + "," + thisTrip.end_statn, 1);
+      //       }
+      //     }
+      //   });
+      // });     
+
+      // Load the stations data. When the data comes back, create an overlay (to make objects on top of map).
+      d3.csv("/data-sets/hubway_stations.csv", function(data) {
+
+        var mapOutStationsToFrequency = d3.map([]);
+        var mapInStationsToFrequency = d3.map([]);
+
+        data.forEach(function(thisStation){
+          outFrequencySum = d3.sum(pairData, function (thisPairData){ if (thisPairData.source == thisStation.id) return thisPairData.frequency});
+          inFrequencySum = d3.sum(pairData, function (thisPairData){ if (thisPairData.destination == thisStation.id) return thisPairData.frequency});
+
+          mapOutStationsToFrequency.set(thisStation.id,outFrequencySum);
+          mapInStationsToFrequency.set(thisStation.id,inFrequencySum);
+        });
+
+        // console.log(mapOutStationsToFrequency.values());
+
+        var outExtent = d3.extent(mapOutStationsToFrequency.values(), function(d){return d});
+        var inExtent = d3.extent(mapInStationsToFrequency.values(), function(d){return d});
+
+        // console.log(outExtent);
+        // console.log(inExtent);
+
+        var outBins = d3.scale.quantize().domain(outExtent).range(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']);
+        var inBins = d3.scale.quantize().domain(inExtent).range(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']);
+        
+        // console.log(outBins(22000));
+        // console.log(outBins(6000));  
+
+        // console.log(mapOutStationsToFrequency.keys());
+        // console.log(mapInStationsToFrequency.keys());
+
+        // mapOutStationsToFrequency.forEach(function(k,v){
+        //   console.log(k + "," + outBins(v));
+        // });
+
+        // mapInStationsToFrequency.forEach(function(k,v){
+        //   console.log(k + "," + inBins(v));
+        // });
+
+          // console.log(thisStation.id + "," + outFrequencySum + "," + inFrequencySum);
+
+        var overlay = new google.maps.OverlayView();
+
+        // Add the container when the overlay is added to the map.
+        overlay.onAdd = function() {
+
+    document.getElementById("legendInfoTooltip").title = "Median Frequency of All Trips = " + frequencyMedian;
+
+    var legend = document.querySelector('#legend');
+    legend.style.display = 'block'; 
+
+          // var markerLegendDiv = document.createElement('div');
+          // markerLegendDiv.innerHTML = "Median Frequency of All Trips = " + frequencyMedian;
+          // legend.appendChild(markerLegendDiv);
+
+          var markerLegendDiv = document.createElement('div');
+          markerLegendDiv.innerHTML = '<img src=/images/AllStations.png> ' + "Unselected station";
+          legend.appendChild(markerLegendDiv);
+
+          var markerLegendDiv = document.createElement('div');
+          markerLegendDiv.innerHTML = '<img src=/images/lessThanMedian.png> ' + "Trips <= Median";                
+          legend.appendChild(markerLegendDiv);
+
+          var markerLegendDiv = document.createElement('div');
+          markerLegendDiv.innerHTML = '<img src=/images/lessThanTwiceMedian.png> ' + "Trips <= Twice Median";                
+          legend.appendChild(markerLegendDiv);
+
+          var markerLegendDiv = document.createElement('div');
+          markerLegendDiv.innerHTML = '<img src=/images/moreThanTwiceMedian.png> ' + "Trips > Twice Median";                
+          legend.appendChild(markerLegendDiv);
+
+          var layer = d3.select(this.getPanes().overlayLayer)
+          .append("div")
+          .attr("class", "stations");
+
+            // Draw each marker as a separate SVG element.
+            // We could use a single SVG, but what size would it have?
+            overlay.draw = function() {
+              
+              // var projection = this.getProjection(),
+              //     padding = 10;
+
+              // var circleMarkersArray = [];
+              var linesArray = [];
+
+              var marker = layer
+                  
+                  .selectAll("svg")
+                  
+                  .data(d3.entries(data))
+                    // .each(addClickableMarker)
+                  
+                  
+                  .enter()  // When there are more data elements than DOM elements
+                  
+                  .append("svg:svg")
+                     .each(addClickableMarker)
+                     .attr("class", "marker");
+                               
+
+              // var marker = layer
+              //     .selectAll("svg")
+              //     .data(d3.entries(data))
+                  
+              //     .each(transform) // update existing markers
+              //       //.each(addClickableMarker)
+              //     .enter()
+              //     .append("svg:svg")
+              //     .each(transform)
+              //       //.each(addClickableMarker)
+              //     .attr("class", "marker");
+
+
+
+
+//            Add a circle.
+              // marker.append("svg:circle")
+              //     .attr("r", 6)
+              //     .attr("cx", padding)
+              //     .attr("cy", padding);
+
+              // Add a label.
+        //       marker.append("svg:text")
+        //           .attr("x", padding + 7)
+        //           .attr("y", padding)
+        //           .attr("dy", ".31em")
+        //            .text(function(d) { return d.value["station"]; });
+
+              function transform(d) {
+       
+                d = new google.maps.LatLng(d.value["lat"], d.value["lng"]);
+                d = projection.fromLatLngToDivPixel(d);
+                return d3.select(this)
+                    .style("left", (d.x - padding) + "px")
+                    .style("top", (d.y - padding) + "px");
+              }
+
+              function addMarker(d) {
+
+                d = new google.maps.Marker({
+                map: map,
+                position: new google.maps.LatLng(d.value["lat"], d.value["lng"]),
+                });
+              }
+
+              function addClickableMarker(d) {
+
+                outFrequencySum = d3.sum(pairData, function (thisPairData){ if (thisPairData.source == d.value.id) return thisPairData.frequency});
+                inFrequencySum = d3.sum(pairData, function (thisPairData){ if (thisPairData.destination == d.value.id) return thisPairData.frequency});
+
+                 var infoWindowContent = ("<p>" + "Total outgoing trips: " + outFrequencySum
+                  + "<br />" + "Total incoming trips: " + inFrequencySum + "</p>");
+
+//                console.log(d.value.id);
+
+                // circleMarker = new google.maps.Circle({
+                //   strokeColor: 'black',
+                //   strokeOpacity: 0.8,
+                //   strokeWeight: 2,
+                //   fillColor: '#FF0000',
+                //   fillOpacity: 0.3,
+                //   map: map,
+                //   center: new google.maps.LatLng(d.value["lat"], d.value["lng"]),
+                //   radius: 50
+                // });
+
+                var circleMarkerIcon = {
+                                      path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: 'transparent',
+                    fillOpacity: 0.6,
+                    scale: 8,
+                    strokeColor: 'black',
+                    strokeOpacity: 0.7,
+                    strokeWeight: 3,
+                    animation: google.maps.Animation.DROP
+                };
+
+                circleMarker = new google.maps.Marker({
+                  position: new google.maps.LatLng(d.value["lat"], d.value["lng"]),
+                  map: map,                  
+                  icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: 'transparent',
+                    fillOpacity: 0.6,
+                    scale: 8,
+                    strokeColor: 'black',
+                    strokeOpacity: 0.7,
+                    strokeWeight: 3,
+                    animation: google.maps.Animation.DROP
+                  }
+                });
+
+                // circleMarker.addListener('load', circleMarker.setAnimation(google.maps.Animation.DROP));
+
+                // circleMarker = projection.fromLatLngToDivPixel(new google.maps.LatLng(d.value["lat"], d.value["lng"]));
+
+                circleMarkersArray.push(new google.maps.LatLng(d.value["lat"], d.value["lng"]));
+
+                // function toggleBounce() {
+                //   if (circleMarker.getAnimation() !== null) {
+                //     circleMarker.setAnimation(null);
+                //   } else {
+                //     circleMarker.setAnimation(google.maps.Animation.BOUNCE);
+                //   }
+                // }
+
+                //create a tooltip
+                var tooltipOptions = {
+                    marker: circleMarker,
+                    content: d.value.station,
+                    cssClass: 'tooltip' // name of a css class to apply to tooltip
+                };
+                var tooltip = new Tooltip(tooltipOptions);
+
+              var stationListener = circleMarker.addListener('click', function() {
+
+                rmLines(linesArray);
+
+                refreshMap = function()
+                {
+                    map.setCenter(new google.maps.LatLng(42.356617, -71.094747));
+                    map.setZoom(mapZoomLevel);   
+                    rmLines(linesArray);                         
+                }
+
+                // map.addListener('zoom_changed', function() {
+                // // map.addListener('bounds_changed', function() {
+                //   //map.setZoom(8);      
+                //   //rmLines(linesArray);
+                // }); 
+
+
+                var tripRadioGroup = document.userForm.trips;
+                     for (var i=0; i<tripRadioGroup.length; i++) {
+                       if (tripRadioGroup[i].checked)
+                          break;
+                     }
+                
+                // console.log("Radio Button " + (i+1) + " is checked.");
+
+                if (i == 0)
+                {
+                  showIncomingTrips = false;
+                }
+                else
+                {
+                  showIncomingTrips = true;
+                }
+
+                  var selectedStation = +d.value.id;
+
+                  var mapOutStationsToPairFrequency = d3.map([]);
+                  var mapInStationsToPairFrequency = d3.map([]);                  
+
+                  if (showIncomingTrips)
+                  {
+                    var mapTripsToFrequencies = mapInStationsToPairFrequency;
+                    //console.log("Showing incoming trips");
+                  }
+                  else
+                  {
+                    var mapTripsToFrequencies = mapOutStationsToPairFrequency;
+                    //console.log("Showing outgoing trips");
+                  }
+
+                  tripData.forEach(function(thisTrip) {
+
+                    if (showIncomingTrips)
+                    {
+                      var stationOfInterest = thisTrip.end_statn;
+                      var complementaryStation = thisTrip.strt_statn;
+                    }
+                    else
+                    {
+                      var stationOfInterest = thisTrip.strt_statn;  
+                      var complementaryStation = thisTrip.end_statn;                  
+                    }
+
+                    if (stationOfInterest == selectedStation)
+                    {
+                      var thisTripAge = 2012 - thisTrip.birth_date;
+                     
+                      // if (thisTrip.duration >= filterDuration[0] || thisTrip.duration <= filterDuration[1])  
+                      // {                    
+                      //  console.log(thisTrip.duration);
+                      // }
+
+                      var parsedDate = timeFormat.parse(thisTrip.start_date);
+
+                      // console.log("DATE: " + parsedDate);
+
+                      if (parsedDate == null)
+                      {
+                        var timeFormatV2 = d3.time.format("%m/%d/%Y %H:%M:%S");
+                        parsedDate = timeFormatV2.parse(thisTrip.start_date);
+                      }
+                      
+                      // console.log("is it null? -> data: " + parsedDate);
+
+                      var hour = hourNumberFormat(parsedDate);
+                      var year = yearFormat(parsedDate);
+                      var month = monthNameFormat(parsedDate);
+                      var day = dayNameFormat(parsedDate);
+
+                      // console.log("Parsed Date FINAL: " + parsedDate);
+                      // console.log(typeof +hour + ": " + hour);
+                      // console.log(year);
+                      // console.log(month);
+                      //console.log(day);                      
+
+                      durationRangeBegin = document.getElementById("durationRangeBegin").value;
+                      durationRangeEnd = document.getElementById("durationRangeEnd").value;
+
+                      hourRangeBegin = document.getElementById("hourRangeBegin").value;
+                      hourRangeEnd = document.getElementById("hourRangeEnd").value;
+
+                      // if (+hourRangeEnd <= +hourRangeBegin)
+                      // {
+                      //   hourRangeBegin = 0;
+                      //   hourRangeEnd = 24;
+                      //   alert("Begin time must be before End time!");
+                      // }       
+
+                      if (
+                           filterSubscription.indexOf(thisTrip.subsc_type) != -1
+                           && 
+                           filterGender.indexOf(thisTrip.gender) != -1
+                           && 
+                           thisTrip.duration >= (durationRangeBegin*60)
+                           && 
+                           thisTrip.duration < (durationRangeEnd*60)
+                           &&
+                           hour >= +hourRangeBegin
+                           && 
+                           hour < +hourRangeEnd
+                           && 
+                           (thisTripAge >= filterAgeRangeBegin && thisTripAge < filterAgeRangeEnd || thisTripAge == 2012)
+                           && 
+                           filterDays.indexOf(day) != -1
+                         )
+                      {
+                        if (mapTripsToFrequencies.has(complementaryStation))
+                        {
+                          var previousFrequency = mapTripsToFrequencies.get(complementaryStation);
+                          mapTripsToFrequencies.set(complementaryStation, previousFrequency+1);
+                        }
+                        else
+                        {
+                          mapTripsToFrequencies.set(complementaryStation, 1);
+                        }
+                      }
+                    }
+                  });
+
+                  // console.log(mapTripsToFrequencies.entries());
+                  // console.log(filterDays);
+
+                  // var frequencyExtent = d3.extent(mapTripsToFrequencies.values(), function (frequencyExtentData){return frequencyExtentData})
+
+                  // console.log(frequencyExtent);
+
+                  var sumOfFrequencies = 0;
+
+                  mapTripsToFrequencies.forEach(function(stationKey, frequencyVal) {
+
+                    sumOfFrequencies += frequencyVal;
+
+                    var pairFrequency = frequencyVal;
+                    var destinationLat = 0;
+                    var destinationLng = 0;
+
+                    data.forEach(function (eachStation) {
+                      if (eachStation.id == stationKey)
+                      {
+                        destinationLat = eachStation.lat;
+                        destinationLng = eachStation.lng;                        
+                      }                    
+                    });
+
+                    var strokeOpacityByFrequency = 0;            
+                    var circleFillColour = 'yellow';
+
+                    // console.log(pairFrequency);
+
+                    if (pairFrequency <= frequencyMedian/4)
+                    {
+                      strokeOpacityByFrequency = 0.1;
+                    }
+                    else if (pairFrequency <= frequencyMedian/2)
+                    {
+                      strokeOpacityByFrequency = 0.2;
+                    }
+                    else if (pairFrequency <= 3*frequencyMedian/4)
+                    {
+                      strokeOpacityByFrequency = 0.3;
+                    }
+                    if (pairFrequency > 3*frequencyMedian/4 && pairFrequency <= frequencyMedian)
+                    {
+                      strokeOpacityByFrequency = 0.4;
+                    }
+                    
+                    else if (pairFrequency > frequencyMedian && pairFrequency <= 5*frequencyMedian/4)
+                    {
+                      strokeOpacityByFrequency = 0.5;
+                      circleFillColour = '#ff7f0e';
+                    }
+                    else if (pairFrequency > 5*frequencyMedian/4 && pairFrequency <= 3*frequencyMedian/2)
+                    {
+                      strokeOpacityByFrequency = 0.6;
+                      circleFillColour = '#ff7f0e';
+                    }                    
+                    else if (pairFrequency > 3*frequencyMedian/2 && pairFrequency <= 7*frequencyMedian/4)
+                    {
+                      strokeOpacityByFrequency = 0.7;
+                      circleFillColour = '#ff7f0e';
+                    }
+                    else if (pairFrequency > 7*frequencyMedian/4 && pairFrequency <= 2*frequencyMedian)
+                    {
+                      strokeOpacityByFrequency = 0.8;
+                      circleFillColour = '#ff7f0e';
+                    }
+                    
+                    else if (pairFrequency > 2*frequencyMedian)
+                    {
+                      strokeOpacityByFrequency = 0.9;
+                      circleFillColour = 'red';
+                    }
+
+                    var lineEndPointSymbolForChosenMarker = {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        fillColor: circleFillColour,
+                        fillOpacity: 0,
+                        scale: 13,
+                        strokeColor: '#1f77b4',
+                        strokeOpacity: 1,
+                        strokeWeight: 1.5
+                    };        
+
+                    var circleOnlyForChosenMarker = new google.maps.Polyline({
+                      
+                      strokeOpacity: 0,
+                      // strokeColor: '#1f77b4',
+                      strokeColor: 'black',
+                      //strokeColor: frequencyColourScale(pairFrequency),                      
+                      //strokeOpacity: 0.6,
+                      strokeWeight: 3,                      
+                      //strokeWeight: pairFrequency/50
+                      path: [new google.maps.LatLng(d.value["lat"], d.value["lng"]),
+                            new google.maps.LatLng(d.value["lat"], d.value["lng"])],
+                      map: map,
+                      icons: [{
+                        icon: lineEndPointSymbolForChosenMarker,
+                        offset: '100%'
+                      }],
+                      //geodesic: true
+                    });
+
+                    linesArray.push(circleOnlyForChosenMarker);
+                    
+                    var lineEndPointSymbol = {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        fillColor: circleFillColour,
+                        fillOpacity: 1,
+                        scale: 8,
+                        strokeColor: 'black',
+                        strokeOpacity: 0,
+                        strokeWeight: 4
+                    };
+
+                    if (!showTripConnections)
+                    {
+                      // rmLines(linesArray);
+                        var line = new google.maps.Polyline({
+                        
+                        strokeOpacity: 0,
+                        // strokeColor: '#1f77b4',
+                        strokeColor: 'black',
+                        //strokeColor: frequencyColourScale(pairFrequency),                      
+                        //strokeOpacity: 0.6,
+                        strokeWeight: 3,                      
+                        //strokeWeight: pairFrequency/50
+                        path: [new google.maps.LatLng(d.value["lat"], d.value["lng"]),
+                              new google.maps.LatLng(destinationLat, destinationLng)],
+                        map: map,
+                        icons: [{
+                          icon: lineEndPointSymbol,
+                          offset: '100%'
+                        }],
+                        //geodesic: true
+                      });
+
+                    }
+                    else
+                    {
+                      // Create the polyline and add the symbol via the 'icons' property.
+                      var line = new google.maps.Polyline({
+                        
+                        strokeOpacity: strokeOpacityByFrequency,
+                        // strokeColor: '#1f77b4',
+                        strokeColor: 'purple',
+                        //strokeColor: frequencyColourScale(pairFrequency),                      
+                        //strokeOpacity: 0.6,
+                        strokeWeight: 3,                      
+                        //strokeWeight: pairFrequency/50
+                        path: [new google.maps.LatLng(d.value["lat"], d.value["lng"]),
+                              new google.maps.LatLng(destinationLat, destinationLng)],
+                        map: map,
+                        icons: [{
+                          icon: lineEndPointSymbol,
+                          offset: '100%'
+                        }],
+                        //geodesic: true
+                      });
+                      }
+
+                    linesArray.push(line);
+            
+                  });
+              
+                  var nowShowing = document.querySelector('#nowShowingDiv');
+
+                  nowShowingDiv.innerHTML = "<h2 >Now Showing</h2>" + sumOfFrequencies + " Trips";
+                  nowShowing.appendChild(nowShowingDiv);
+
+                  nowShowing.style.display = 'block';
+
+                  // mapTripsToFrequencies = null;
+
+                 // Change the type from string to int                  
+                //  function type_pairData(thisPair) {
+                //     thisPair.source = +thisPair.source;
+                //     thisPair.destination  = +thisPair.destination;
+                //     thisPair.frequency = +thisPair.frequency;
+                //   return thisPair;
+                //  }
+
+                //  d3.csv("hubway_trips_pairs.csv", type_pairData, function(pairData) { 
+                  
+                //   var frequencyExtent = d3.extent(pairData, function (frequencyExtentData){return frequencyExtentData.frequency})
+
+                //   var frequencyColourScale = d3.scale.ordinal()
+                //                       .domain(frequencyExtent)
+                //                        // .range(["#d62728", "#bcbd22"]);
+                //                       //.range(["yellow", "red"]);       
+                //                        .range(["#393b79", "#5254a3", "#6b6ecf", "#9c9ede"]);                                                                     
+                //   // var frequencyOpacityScale = d3.scale.pow().exponent(0.2)
+                //   //                     .domain(frequencyExtent)
+                //   //                     .range([0,1]);
+
+                                                       
+                //   var frequencyOpacityScale = d3.scale.log()
+                //                       .domain(frequencyExtent)
+                //                       .range([0,1]);
+
+
+                //   // console.log(frequencyColourScale(1));
+                //   // console.log(frequencyColourScale(5185));                  
+                //   // console.log(frequencyColourScale(2600));                  
+
+                //   // console.log(frequencyOpacityScale(1));
+                //   // console.log(frequencyOpacityScale(5185));                  
+                //   // console.log(frequencyOpacityScale(2600));
+
+                //   pairData.forEach( function (thisPair) { 
+                    
+                //     if (thisSourceStationId == thisPair["source"])
+                //     {
+                //       var destinationLat = 0;
+                //       var destinationLng = 0;
+                //       var frequency = thisPair["frequency"]
+
+                //     data.forEach(function (eachStation) {
+                //       if (eachStation.id == thisPair.destination)
+                //       {
+                //         destinationLat = eachStation.lat;
+                //         destinationLng = eachStation.lng;                        
+                //       }
+                //     });
+
+
+                //     var lineSymbol = {
+                //         path: google.maps.SymbolPath.CIRCLE,
+                //         fillColor: 'blue',
+                //         fillOpacity: 1,
+                //         scale: 7,
+                //         strokeColor: 'black',
+                //         strokeOpacity: 1,
+                //         strokeWeight: 4
+                //     };
+
+                //     // console.log(frequency);
+
+                //     var strokeOpacityByFrequency = frequencyOpacityScale(frequency) + 0.2;
+
+                //     if (strokeOpacityByFrequency < 0.6)
+                //     {
+                //       strokeOpacityByFrequency = 0;
+                //     }
+
+                //     // Create the polyline and add the symbol via the 'icons' property.
+                //     var line = new google.maps.Polyline({
+                      
+                //       strokeOpacity: strokeOpacityByFrequency,
+                //       strokeColor: '#1f77b4',
+                //       //strokeColor: frequencyColourScale(frequency),                      
+                //       //strokeOpacity: 0.6,
+                //       strokeWeight: 8,                      
+                //       //strokeWeight: frequency/50
+                //       path: [new google.maps.LatLng(d.value["lat"], d.value["lng"]),
+                //             new google.maps.LatLng(destinationLat, destinationLng)],
+                //       map: map,
+                //       icons: [{
+                //         icon: lineSymbol,
+                //         offset: '100%'
+                //       }],
+                //       //geodesic: true
+                //     });
+
+                //     linesArray.push(line);
+
+
+                //         // console.log();
+                //     }
+
+                //     // console.log(thisPair["source"]) 
+                //   }); 
+                // });
+                });
+
+                var infowindow = new google.maps.InfoWindow({
+                  content: infoWindowContent,
+                  position: new google.maps.LatLng(d.value["lat"], d.value["lng"])
+                });
+
+                circleMarker.addListener('rightclick', function() {
+                  infowindow.open(map);
+                });
+
+              }
+            }
+          }
+
+        // Bind our overlay to the map…
+        overlay.setMap(map);
+        });
+      });
+     });
+
+    </script>
+  </body>
+</html>
